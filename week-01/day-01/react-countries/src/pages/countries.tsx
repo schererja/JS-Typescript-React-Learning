@@ -1,0 +1,73 @@
+import React, { useEffect, useRef, useState } from "react";
+import { getCountries } from "../services/CountriesService";
+import CountryCard from "../component/CountryCard";
+import "../App.css";
+import type { Country } from "../models/Country";
+
+const Countries: React.FC = () => {
+  const [countries, setCountries] = useState([] as Country[]);
+  const [rawInput, setRawInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const debounceRef = useRef<number | null>(null);
+
+  const onChange = (eventTriggered: React.ChangeEvent<HTMLInputElement>) => {
+    const value = eventTriggered.target.value;
+    setRawInput(value);
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = window.setTimeout(() => {
+      // Explicit window.setTimeout for browser
+      setSearchTerm(value);
+    }, 300);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    getCountries().then((data) => {
+      console.log("Countries data fetched");
+      console.log(data);
+      setCountries(data || []);
+    });
+  }, []);
+
+  const filteredCountries = countries.filter((country: Country) =>
+    country.name.common.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="cards-container">
+      <h2>Countries</h2>
+      <label htmlFor="country-search" style={{ textAlign: "left" }}>
+        Search countries
+      </label>
+      <input
+        id="country-search"
+        type="text"
+        placeholder="Search countries..."
+        value={rawInput}
+        onChange={onChange}
+        style={{ marginBottom: "20px", padding: "10px", width: "100%" }}
+        aria-label="Search countries"
+      />
+      <div className="country-list">
+        {" "}
+        {/* Add this wrapper for grid */}
+        {filteredCountries.map((country: Country) => (
+          <CountryCard key={country.cca2} country={country} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Countries;
