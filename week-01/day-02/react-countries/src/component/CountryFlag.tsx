@@ -9,7 +9,7 @@ export default function CountryFlag({
     <img
       src={srcUrl}
       alt={`Flag of ${name}`}
-      width="100%"
+      width="50%"
       style={{ marginRight: "10px" }}
       loading="lazy"
     />
