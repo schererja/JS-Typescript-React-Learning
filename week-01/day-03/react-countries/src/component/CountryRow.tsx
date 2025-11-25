@@ -1,4 +1,4 @@
-import type { Country } from "../models/Country";
+import type { Country } from "../types/Country";
 import CountryFlag from "./CountryFlag";
 
 export default function CountryRow({ country }: { country: Country }) {

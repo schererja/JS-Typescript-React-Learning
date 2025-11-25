@@ -5,11 +5,20 @@ import TableHeader from "./TableHeader";
 import FilterDropdown from "./FilterDropdown";
 import type { TableColumn } from "../models/TableColumn";
 
+//Use not a type but an interface?
 type tableProps = {
   countries: Array<Country>;
 };
 
 export default function CountryTable(tableProps: tableProps) {
+  //This should have been like this:
+  // import { SortDirection } from "../models/Sort";
+
+  // interface SortConfig {
+  //   key: keyof Country | "";
+  //   direction: SortDirection | "";
+  // }
+
   const [sortConfig, setSortConfig] = useState({
     key: "",
     direction: "",
@@ -34,6 +43,7 @@ export default function CountryTable(tableProps: tableProps) {
   const { countries } = tableProps;
 
   const filteredCountries =
+    // MAGIC NUMBER ?!?!?!
     selectedRegion === "All"
       ? countries
       : countries.filter((country) => country.region === selectedRegion);
@@ -46,7 +56,7 @@ export default function CountryTable(tableProps: tableProps) {
     setSortConfig({ key, direction });
   };
 
-  // Just use to sort countries based on sortConfig
+  // Just use to sort countries based on sortConfig.  This should use a useMemo instead
   const sortedCountries = [...filteredCountries].sort((a, b) => {
     if (!sortConfig.key) return 0;
     let aValue: string | number;
@@ -90,9 +100,11 @@ export default function CountryTable(tableProps: tableProps) {
           requestSort={requestSort}
           sortConfig={sortConfig}
         />
-        {sortedCountries.map((country) => (
-          <CountryRow key={country.cca2} country={country} />
-        ))}
+        <tbody>
+          {sortedCountries.map((country) => (
+            <CountryRow key={country.cca2} country={country} />
+          ))}
+        </tbody>
       </table>
     </>
   );
