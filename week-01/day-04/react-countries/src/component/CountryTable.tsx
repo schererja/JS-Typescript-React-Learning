@@ -71,7 +71,7 @@ export default function CountryTable({ countries }: tableProps) {
   // useEffect(() => {
   //   setCurrentPage(1);
   // }, [sortedCountries]);
-  const totalPages = Math.ceil(countries.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedCountries.length / itemsPerPage);
 
   const pagedCountries = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
