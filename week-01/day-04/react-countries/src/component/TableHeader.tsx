@@ -1,10 +1,11 @@
 import type { TableColumn } from "../types/TableColumn";
 
-type TableHeaderProps = {
+//Table header component with sorting functionality
+interface TableHeaderProps {
   columns?: Array<TableColumn>;
-  requestSort?: (key: string) => void;
+  requestSort: (key: string) => void;
   sortConfig?: { key: string; direction: string };
-};
+}
 
 export default function TableHeader({
   columns,

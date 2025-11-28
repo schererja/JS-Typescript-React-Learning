@@ -5,13 +5,13 @@ import TableHeader from "./TableHeader";
 import FilterDropdown from "./FilterDropdown";
 import type { TableColumn } from "../types/TableColumn";
 import Pagination from "./Pagination";
-
+//TODO: prevent page numbers going out of range, and memoize columns for micro optimization
 //Use not a type but an interface?
-type tableProps = {
+interface TableProps {
   countries: Array<Country>;
-};
+}
 
-export default function CountryTable({ countries }: tableProps) {
+export default function CountryTable({ countries }: TableProps) {
   const [sortConfig, setSortConfig] = useState({
     key: "",
     direction: "",

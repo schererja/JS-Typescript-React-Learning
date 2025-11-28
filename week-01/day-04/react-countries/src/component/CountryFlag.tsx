@@ -1,10 +1,8 @@
-export default function CountryFlag({
-  srcUrl,
-  name,
-}: {
+interface CountryFlagProps {
   srcUrl: string;
   name: string;
-}) {
+}
+export default function CountryFlag({ srcUrl, name }: CountryFlagProps) {
   return (
     <img
       src={srcUrl}

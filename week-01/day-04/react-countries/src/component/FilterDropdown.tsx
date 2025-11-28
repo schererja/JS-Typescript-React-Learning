@@ -1,10 +1,10 @@
 import React from "react";
 
-type FilterDropdownProps = {
+interface FilterDropdownProps {
   regions: string[];
   selectedRegion: string;
   onSelectRegion: (region: string) => void;
-};
+}
 
 export default function FilterDropdown({
   regions,

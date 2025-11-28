@@ -2,7 +2,11 @@ import React from "react";
 import type { Country } from "../types/Country";
 import CountryFlag from "./CountryFlag";
 
-function CountryRow({ country }: { country: Country }) {
+interface CountryRowProps {
+  country: Country;
+}
+
+function CountryRow({ country }: CountryRowProps) {
   return (
     <tr key={country.cca2}>
       <td>{country.name.common}</td>
