@@ -1,15 +1,15 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Countries from "./pages/Countries";
+import Countries from "./pages/countries";
 
 const App: React.FC = () => {
   return (
     <Router>
       <nav>
-        <Link to="/countries">Countries</Link>
+        <Link to="/">Countries</Link>
       </nav>
       <Routes>
-        <Route path="/countries" element={<Countries />} />
+        <Route path="/" element={<Countries />} />
       </Routes>
     </Router>
   );

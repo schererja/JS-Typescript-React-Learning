@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import type { Country } from "../types/Country";
+import type { SortDirection } from "../types/SortDirection";
 
 export type SortKey = "Name" | "Region" | "Population" | "";
-export type SortDirection = "ascending" | "descending" | "";
 
 export interface SortConfig {
-  key: SortKey;
-  direction: SortDirection;
+  key: SortKey | "";
+  direction: SortDirection | "";
 }
 
 export function useSortedCountries(
