@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "../App.css";
 import type { Country } from "../types/Country";
 import CountryTable from "../component/CountryTable";
-import { useCountries } from "../hooks/userCountries";
+import { useCountries } from "../hooks/useCountries";
 import ErrorState from "../component/ErrorState";
 import Loading from "../component/Loading";
 import SearchBar from "../component/SearchBar";

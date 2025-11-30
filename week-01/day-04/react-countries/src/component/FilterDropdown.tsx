@@ -14,16 +14,27 @@ export default function FilterDropdown({
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     onSelectRegion(event.target.value);
   };
+  const options = React.useMemo(
+    () =>
+      regions.map((region) => (
+        <option key={region} value={region}>
+          {region}
+        </option>
+      )),
+    [regions]
+  );
   return (
-    <label>
-      Filter by Region:
-      <select value={selectedRegion} onChange={handleChange}>
-        {regions.map((region) => (
-          <option key={region} value={region}>
-            {region}
-          </option>
-        ))}
+    <div>
+      <label htmlFor="region-select">Filter by Region:</label>
+      <select
+        id="region-select"
+        value={selectedRegion}
+        onChange={handleChange}
+        aria-label="Filter Countries by region"
+      >
+        <option value="">All Regions</option>
+        {options}
       </select>
-    </label>
+    </div>
   );
 }

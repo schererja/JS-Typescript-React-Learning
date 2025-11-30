@@ -10,6 +10,7 @@ export default function CountryFlag({ srcUrl, name }: CountryFlagProps) {
       width="50%"
       style={{ marginRight: "10px" }}
       loading="lazy"
+      aria-label={`Flag of ${name}`}
     />
   );
 }

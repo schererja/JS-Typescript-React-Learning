@@ -1,6 +1,7 @@
 import React from "react";
 import type { Country } from "../types/Country";
 import CountryFlag from "./CountryFlag";
+import { formatNumber } from "../utils/formatters";
 
 interface CountryRowProps {
   country: Country;
@@ -8,10 +9,15 @@ interface CountryRowProps {
 
 function CountryRow({ country }: CountryRowProps) {
   return (
-    <tr key={country.cca2}>
-      <td>{country.name.common}</td>
+    <tr tabIndex={0} className="country-row">
+      <td scope="row">{country.name.common}</td>
       <td>{country.region}</td>
-      <td>{country.population.toLocaleString()}</td>
+      <td
+        style={{ textAlign: "right" }}
+        title={`Population: ${formatNumber(country.population)}`}
+      >
+        {formatNumber(country.population)}
+      </td>
       <td style={{ textAlign: "center" }}>
         <CountryFlag srcUrl={country.flags.png} name={country.name.common} />
       </td>

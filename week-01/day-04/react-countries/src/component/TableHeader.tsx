@@ -1,10 +1,10 @@
+import type { SortKey } from "../hooks/useSortedCountries";
 import type { TableColumn } from "../types/TableColumn";
 
-//Table header component with sorting functionality
 interface TableHeaderProps {
   columns?: Array<TableColumn>;
-  requestSort: (key: string) => void;
-  sortConfig?: { key: string; direction: string };
+  requestSort: (key: SortKey) => void;
+  sortConfig?: { key: SortKey; direction: "ascending" | "descending" | "" };
 }
 
 export default function TableHeader({
@@ -12,29 +12,43 @@ export default function TableHeader({
   requestSort,
   sortConfig,
 }: TableHeaderProps) {
+  const showSortIcon = (columnKey: string) => {
+    if (!sortConfig || sortConfig.key !== columnKey) return null;
+    return sortConfig.direction === "ascending" ? " ▲" : " ▼";
+  };
   return (
     <thead>
-      {columns ? (
-        <tr>
-          {columns.map((column) => (
-            <th key={column.key} onClick={() => requestSort(column.key)}>
-              {column.label}
-              {sortConfig?.key === column.key
+      {(
+        columns ?? [
+          { key: "Name", label: "Name" },
+          { key: "Region", label: "Region" },
+          { key: "Population", label: "Population" },
+          { key: "Flag", label: "Flag" },
+        ]
+      ).map((column) => {
+        const isSortable = column.sortable ?? true; // Default to true if undefined
+        return (
+          <th
+            key={column.key}
+            onClick={
+              isSortable
+                ? () => isSortable && requestSort(column.key as SortKey)
+                : undefined
+            }
+            style={{ cursor: isSortable ? "pointer" : "default" }}
+            aria-sort={
+              sortConfig?.key === column.key
                 ? sortConfig.direction === "ascending"
-                  ? " ▲"
-                  : " ▼"
-                : null}
-            </th>
-          ))}
-        </tr>
-      ) : (
-        <tr>
-          <th>Name</th>
-          <th>Region</th>
-          <th>Population</th>
-          <th>Flag</th>
-        </tr>
-      )}
+                  ? "ascending"
+                  : "descending"
+                : "none"
+            }
+          >
+            {column.label}
+            {isSortable && showSortIcon(column.key)}
+          </th>
+        );
+      })}
     </thead>
   );
 }

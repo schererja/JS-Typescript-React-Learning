@@ -1,126 +1,123 @@
+// src/components/CountryTable.tsx
+
 import type { Country } from "../types/Country";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useCallback, useState } from "react";
 import CountryRow from "./CountryRow";
 import TableHeader from "./TableHeader";
 import FilterDropdown from "./FilterDropdown";
-import type { TableColumn } from "../types/TableColumn";
 import Pagination from "./Pagination";
-//TODO: prevent page numbers going out of range, and memoize columns for micro optimization
-//Use not a type but an interface?
+
+import { useFilteredCountries } from "../hooks/useFilteredCountries";
+import { useSortedCountries, type SortKey } from "../hooks/useSortedCountries";
+import { useRegions } from "../hooks/useRegions";
+import { usePagination } from "../hooks/usePagination";
+import type { TableColumn } from "../types/TableColumn";
+
 interface TableProps {
   countries: Array<Country>;
 }
 
 export default function CountryTable({ countries }: TableProps) {
-  const [sortConfig, setSortConfig] = useState({
-    key: "",
-    direction: "",
-  });
+  //
+  // 1. REGION FILTER
+  //
+  const { regions } = useRegions(countries);
   const [selectedRegion, setSelectedRegion] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const ALL_REGIONS = "All";
-  // Build the list of regions from the countries list
-  const regions = useMemo(() => {
-    const set = new Set<string>();
-    countries.forEach((country) => country.region && set.add(country.region));
-    return ["All", ...Array.from(set).sort()];
-  }, [countries]);
 
-  const filteredCountries: Array<Country> = useMemo(() => {
-    return selectedRegion === ALL_REGIONS
-      ? countries
-      : countries.filter((country) => country.region === selectedRegion);
-  }, [countries, selectedRegion]);
+  //
+  // 2. FILTER COUNTRIES
+  //
+  const filteredCountries = useFilteredCountries(countries, {
+    region: selectedRegion,
+    searchTerm: "",
+    allRegionValue: "All",
+  });
 
-  // Just use to sort countries based on sortConfig.  This should use a useMemo instead
-  const sortedCountries = useMemo(() => {
-    return [...filteredCountries].sort((a, b) => {
-      if (!sortConfig.key) return 0;
-      let aValue: string | number;
-      let bValue: string | number;
+  //
+  // 3. SORTING
+  //
+  const [sortConfig, setSortConfig] = useState({
+    key: "" as SortKey,
+    direction: "ascending" as "ascending" | "descending" | "",
+  });
 
-      switch (sortConfig.key) {
-        case "Name":
-          aValue = a.name.common.toLowerCase();
-          bValue = b.name.common.toLowerCase();
-          break;
-        case "Region":
-          aValue = a.region.toLowerCase();
-          bValue = b.region.toLowerCase();
-          break;
-        case "Population":
-          aValue = a.population;
-          bValue = b.population;
-          break;
-        default:
-          return 0;
+  const sortedCountries = useSortedCountries(filteredCountries, sortConfig);
+  const { currentPage, totalPages, currentItems, goToPage } = usePagination(
+    sortedCountries,
+    10
+  );
+
+  const requestSort = useCallback(
+    (key: SortKey) => {
+      let direction: "ascending" | "descending" = "ascending";
+
+      if (sortConfig.key === key && sortConfig.direction === "ascending") {
+        direction = "descending";
       }
 
-      if (aValue < bValue) {
-        return sortConfig.direction === "ascending" ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return sortConfig.direction === "ascending" ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [filteredCountries, sortConfig.direction, sortConfig.key]);
+      setSortConfig({ key, direction });
+      goToPage(1);
+    },
+    [sortConfig.key, sortConfig.direction, goToPage]
+  );
 
-  // // Reset to first page when countries or filter changes
-  // useEffect(() => {
-  //   setCurrentPage(1);
-  // }, [sortedCountries]);
-  const totalPages = Math.ceil(sortedCountries.length / itemsPerPage);
+  //
+  // 4. PAGINATION
+  //
 
-  const pagedCountries = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return sortedCountries.slice(start, end);
-  }, [currentPage, sortedCountries]);
+  //
+  // 5. COLUMNS
+  //
+  const columns: TableColumn[] = useMemo(
+    () => [
+      { key: "Name", label: "Name", sortable: true },
+      { key: "Region", label: "Region", sortable: true },
+      { key: "Population", label: "Population", sortable: true },
+      { key: "Flag", label: "Flag", sortable: false },
+    ],
+    []
+  );
 
-  const columns: TableColumn[] = [
-    { key: "Name", label: "Name", sortable: true },
-    { key: "Region", label: "Region", sortable: true },
-    { key: "Population", label: "Population", sortable: true },
-    { key: "Flag", label: "Flag", sortable: false },
-  ];
-  const onRegionChange = useCallback((region: string) => {
-    setSelectedRegion(region);
-    setCurrentPage(1);
-  }, []);
-  const requestSort = (key: string) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
-    }
-    setSortConfig({ key, direction });
-    setCurrentPage(1);
-  };
+  //
+  // 6. HANDLERS
+  //
+  const onRegionChange = useCallback(
+    (region: string) => {
+      setSelectedRegion(region);
+      goToPage(1);
+    },
+    [goToPage]
+  );
 
   return (
     <>
+      {/* FILTER DROPDOWN */}
       <FilterDropdown
         regions={regions}
         selectedRegion={selectedRegion}
         onSelectRegion={onRegionChange}
       />
+
+      {/* TABLE */}
       <table>
         <TableHeader
           columns={columns}
           requestSort={requestSort}
           sortConfig={sortConfig}
         />
+
         <tbody>
-          {pagedCountries.map((country) => (
+          {currentItems.map((country) => (
             <CountryRow key={country.cca2} country={country} />
           ))}
         </tbody>
       </table>
+
+      {/* PAGINATION */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={setCurrentPage}
+        onPageChange={goToPage}
       />
     </>
   );

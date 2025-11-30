@@ -60,3 +60,38 @@
     grid-template-columns: 1fr;
   }
 }
+.country-row:hover {
+  background-color: #000000;
+}
+
+.country-row:focus {
+  outline: 2px solid #007bff;
+}
+.searchbar-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none;
+}
+.searchbar {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.searchbar-label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.searchbar-input {
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+.pagination button.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
